@@ -1,0 +1,689 @@
+---
+title: "How can companies assess which customers qualify for credit approval?"
+output: html_document
+---
+# Framing the problem
+## 1. Problem recognition
+To date, payment in monthly installments is a type of payment often customers look for whenever they purchase items especially the high-priced ones. This is where credit/lending programs play an important role in profitability of any banks and financial services industries. While this sounds beneficial, it's not always the case since it still depends on how an institution evaluates their customers' credits. 
+
+This being considered, failure to assess accurately the merit of an individual applying for a loan can lead to 2 possible scenarios: granting a credit to a person with a higher risk than desirable or not granting a credit to a person with more than acceptable credit risk.
+
+<b>How can companies assess which customers qualify for credit approval?</b>
+
+Our dataset contains 1000 observations provided by Professor Dr. Hans Hofmann, at Institut für Statistik und "Okonometrie Universit" at Hamburg University (<a href='https://archive.ics.uci.edu/ml/datasets/statlog+(german+credit+data)'>source</a>). It describes people using a set of attributes and assign them a ‘good’ or ‘bad’ credit risk. 
+
+Such task was historically performed through human judgment, is it still the case? Are algorithms accurate enough to become fully entitled to make a decision?
+<br><br>
+
+## 2. Review of Previous findings
+
+### 2.1 Key insights
+With the trend of e-commerce industry where companies like eBay, Amazon and Walmart <sup>[1]</sup> get to have big market share is brought about by providing convenient ways of payments options to their customers, allowing them to pay in monthly basis instead of one-time payment. However, there are still some known consumer goods companies that  do not offer the possibility to purchase their items through monthly payments. 
+
+According to a research released in November 2018 by Citizens Bank<sup>[3]</sup>,
+
+> "76% of U.S. consumers are more likely to make a retail purchase if a payment plan backed by a simple and seamless point of sale experience is offered.
+Therefore, if a company wants to maximize the sales of its products it is important to provide a payment plan in installments."
+There are fundamentally 2 ways to offer a payment in installments:
+<ul>
+<li>Offering the service at the check-out through an accredited financial services company (e.g. Ebay with ‘PayPal Credit’)</li>
+<li>Providing the service using the company’s own brand, issuance of the credit and credit cards with a partner (e.g. Amazon with ‘Amazon Store Card’ issued by Synchrony Bank)</li>
+</ul>
+
+
+In any case, if a company choose to provide such service, <b> it needs data to evaluate whether a customer is worthy or not to receive the credit. This kind of information can be gathered directly upon users' registration and just by browsing the website, both externally or at the checkout section.</b>
+
+However, the application for the payment in monthly installments must be simple and seamless to be effective, hence data collection in-store might not be a convenient way to consider.<br>
+In the long term, <a href="https://www2.deloitte.com/content/dam/Deloitte/uk/Documents/financial-services/deloitte-uk-mastercard-the-future-of-credit-a-european-perspective-2019-report-digital-updated.pdf">‘The Future of Credit’ 2018 Deloitte’s</a> Report predicts consumer spending to rise together with growth in credit demand. However, this trend has been slowed down by the Covid-19 global pandemic.
+As we can see in Graph. 1, after the economic crisis in 2008 the consumer credit change has been negative for approximately 5 years. 
+
+<center>![](images/Picture1.png)<br>
+<a href="https://www.ecb.europa.eu/pub/pdf/other/ebbox201707_03.en.pdf?ad68ed4b5b551c5f4472b36bb12d5525">Graph.1 source</a><br></center>
+
+Probably, this is due to the combination of 2 effects:
+
+<ul>
+<li>Due to the economic recession, consumers have less money to spend</li>
+<li>Consumers tend to have less confidence in their present and future financial situation and, as a result, they are more conservative.</li>
+</ul>
+
+Graph 2. shows that the 2nd effect has had a greater impact than the prior, because the EU consumer credit outstanding has had a consistent negative gap with the retail volume growth throughout the years that followed the economic crisis, while the gap has been negative in the following years.
+
+<center>![](images/Picture3.png)<br>
+<a href="https://www2.deloitte.com/content/dam/Deloitte/uk/Documents/financial-services/deloitte-uk-mastercard-the-future-of-credit-a-european-perspective-2019-report-digital-updated.pdf">Graph.2 source</a><br></center>
+
+<br>As expected, in Graph. 3 we can see that the consumer confidence has declined during the period of post-crisis (2008-2014).<br>
+
+<center>![](images/Picture2.png)<br>
+<a href="https://ec.europa.eu/info/sites/info/files/flash_consumers_2020_11_en.pdf">Graph.3 source</a><br></center>
+
+In conclusion, we might expect an unfavorable movement in consumer credit in the coming years due to the economic recession and due to consumers' confidence that was triggered by the current pandemic. Despite this however, since consumer spending is expected to rise and since consumer credit is positively correlated with expenditures, this may prompt consumer credit to spike as well. 
+
+Finally, since the consumer credit is shifting towards to the B2C e-commerce market, this may give a competitive advantage to e-commerce (like Amazon US) that give the possibility to customers to buy their products with monthly installations. Therefore, it is becoming particularly important for all the companies that want to maximize the sales, especially on their ecommerce, to provide a simple and seamless service of consumer credit.
+<br>
+
+#### Sources
+
+<ul>
+<li>Amazon.com, ebay.com, Walmart.com</li>
+<li>https://www.economist.com/free-exchange/2008/10/20/night-of-the-living-debt</li>
+<li>https://www.businesswire.com/news/home/20181108005056/en/76-Of-Consumers-Are-More-Likely-to-Make-a-Purchase-If-a-Simple-and-Seamless-Payment-Plan-is-Offered</li>
+</ul><br>
+
+### 2.2 Defining the Hypothesis  
+
+Using data about customers asking for a consumer credit we expect to create a model able to predict with reliable accuracy if the company should grant the credit or not. Namely,
+classifying the customers as:<br>
+ 
+<ul>
+<li>0 = Good</li>
+<li>1 = Bad</li>
+</ul>
+
+  
+When making a binary classification, as in our case, we have two classes (Good or Bad) there 4 possible outcomes:
+
+<ul>
+<li>1.<b>True Positive</b>: The model's correctly predicted the class Good </li>
+<li>2.<b>False Positive</b>: The model's predicted the class Good, when instead it should have predicted the class Bad (Type 1 error)</li>
+<li>3.<b>False Negative</b>: The model's predicted the class Bad, when instead it should have predicted the class Good (Type 1 error)</li>
+<li>4.<b>True Negative</b>: The model's correctly predicted the class Bad </li>
+</ul>
+
+<center>![](images/Picture4.png)</center><br>
+<a href="https://towardsdatascience.com/confusion-matrix-for-your-multi-class-machine-learning-model-ff9aa3bf7826">source</a><br></center>
+
+The owner of the dataset suggested to weigh 5 times more a type 1 error than a type 2 error, and since we are using the classification of Good and Bad customers he provided, we are going to keep that 5:1 ratio in our loss function.<br>
+
+
+#### 2.2.1. Research Design 
+
+In this research, the `Binary Logistic Regression Model` -- a type of logistic regression that is commonly used to predict the relationship between predictors and a dependent variable where this variable is `dichotomous` (e.g., Gender [Female vs Male], acceptance [Yes or No]). In our case, the dependent variable is the "Credit Risk". This estimates the probability that the dependent variable belongs to a particular category. source: https://www.statisticssolutions.com/what-is-logistic-regression/
+
+For example:
+
+Pr(Credit Risk = Good|with credits existing in other banks)
+
+To explain the conditional statement above, it simply say that the value of Pr(Credit Risk = Good|with credits existing in other banks) will range between 0 and 1 and for any given value of other existing credits, a prediction can be concluded for its credit risk.
+
+
+$$
+{logit}(\pi_i)=log\frac{p(X)}{1−p(X)}={\beta_0}+{\beta_1x}...+{\beta_nx}
+$$
+
+<br><br><br>
+
+## Solving the Problem
+
+#### Setting up packages 
+
+Loading the packages we are going to use throughout the analysis
+
+```{r Libraries, echo=TRUE, message=FALSE}
+# Library containing useful methods to manipulate tables
+library(tidyverse)
+library(modelr)
+library(broom)
+library(dplyr)
+# Library to build correlation plots
+library(corrplot)
+library(Hmisc)
+library(forcats)
+library(RColorBrewer)
+library(caret)
+library(ROCR)
+
+# Library for stepwise regressions
+# install.packages("leaps")
+library(leaps)
+```
+
+## 1 Data and Variable Selection
+
+
+
+### 1.1 importing the dataset 
+The raw data file contains 1000 observations of 21 variables. Each observation refers to a customer and every customer' credit risk is classified as good or bad. These  21 attributes are used to evaluate loan applications. 
+
+```{r Load data}
+# Load the dataset from the .csv file
+df_raw_german_credit <- read.csv("german_data.csv", stringsAsFactors=FALSE, fileEncoding="latin1")
+# Save the dataset as a Table
+tbl_german_credit <- as_tibble(df_raw_german_credit)
+```
+
+To increase clarity of the meaning of the variables and reduce the lenght of the variables in some cases we changed the column names.
+```{r Change column names}
+# Create a vector with new column names
+v_updated_colnames <- c("Account_Balance",  "Duration_of_Credit",  "Status_Prev_Credits",  "Purpose",  "Credit_Amount",  "Savings",  "Employment_Duration",  "Installment_Rate",  "Sex_Marital_Status",  "Guarantors",  "Residence_Years",  "Assets",  "Age",  "Concurrent_Credits",  "Housing",  "Existing_Credits",  "Job",  "N_Dependents",  "Telephone",  "Foreign_Worker",  "Credit_Risk")
+# Update column names
+colnames(tbl_german_credit) <- v_updated_colnames
+# Save the table into newly create table for later use
+tbl_german_credit_num <- tbl_german_credit
+```
+
+The categorical variables' values have been encoded using categorical/symbolic attributes.
+```{r Show raw dataset}
+# Dispaly the first 5 rows of the dataset
+head(tbl_german_credit,5)
+```
+
+Since the dataset comes with a legend, explaining what each code means, we have transformed the symbolic values to their respective categorical values
+For example, all the column Purpose has the following legend: 
+
+<center>![](images/pic_variable_legend.png)</center><br>
+
+In this case all the "A40" have been transformed to "car (new)", all the "A41" have been transformed to "car (used)", and so on.<br><br>
+
+To apply such transformation, we created a decoding matrix for each categorical variable.
+```{r Decoding matrices}
+### Define the decoding matrices for each categorical variable ###
+df_decod_Account_Balance <- data.frame(c("A11", "A12","A13","A14"),c("x < 0" , "0 <= x < 200", "x >=200", "no checking account"),c(3,2,1,4))
+df_decod_Status_Prev_Credits <- data.frame(c("A30","A31","A32","A33","A34"),c("no credits taken/all credits paid" , "all credits at this bank paid", "existing credits paid", "delay in paying off","critical account/other credits existing (not at this bank)"),c(1,2,3,4,5))
+df_decod_Purpose <- data.frame(c("A40","A41","A42","A43","A44","A45","A46","A47","A48","A49","A410"),c("car (new)" , "car (used)", "furniture/equipment", "radio/television","domestic appliances", "repairs", "education","vacation", "retraining", "business", "other"))
+df_decod_Savings <- data.frame(c("A61","A62","A63","A64","A65"), c("x < 100" , "100 <= x < 500", "500 <= x < 1000", "x >= 1000","unkown/no savings account"),c(2,3,4,5,1))
+df_decod_Employment_Duration <- data.frame(c("A71","A72","A73","A74","A75"), c("unemployed","x < 1" , "1 <= x < 4", "4 <= x < 7", "x >= 7"),c(1,2,3,4,5))
+df_decod_Sex_Marital_Status <- data.frame(c("A91","A92","A93","A94","A95"), c("male divorced/separated" , "female divorced/separated", "male single", "male married/widowed", "female single"))
+df_decod_Guarantors <- data.frame(c("A101","A102","A103"), c("none" , "co-applicant", "guarantor"),c(1,2,3))
+df_decod_Assets <- data.frame(c("A121","A122","A123","A124"), c("real estate" , "life insurance", "car", "no property"),c(4,3,2,1))
+df_decod_Concurrent_Credits <- data.frame(c("A141","A142","A143"), c("bank" , "stores", "none"))
+df_decod_Housing <- data.frame(c("A151","A152","A153"), c("rent" , "own", "for free"),c(1,2,3))
+df_decod_Job <- data.frame(c("A171","A172","A173","A174"), c("unemployed/unskilled - non-resident" , "unskilled - resident", "skilled employee / official", "management / self-employed / highly qualified employee / officer"), c(1,2,3,4))
+df_decod_Telephone <- data.frame(c("A191","A192"), c("no" , "yes"), c(1,2))
+df_decod_Foreign_Worker <- data.frame(c("A201","A202"), c("yes" , "no"), c(1,2))
+# Create a list containing all the decoding matrices
+l_decod_matrices <- list(df_decod_Account_Balance, df_decod_Status_Prev_Credits, df_decod_Purpose, df_decod_Savings, df_decod_Employment_Duration, df_decod_Sex_Marital_Status , df_decod_Guarantors, df_decod_Assets,  df_decod_Concurrent_Credits,  df_decod_Housing, df_decod_Job, df_decod_Telephone,  df_decod_Foreign_Worker)
+# Vector containing the names of all the categorical values
+v_cat_cols <- c("Account_Balance",  "Status_Prev_Credits",  "Purpose",  "Savings", "Employment_Duration", "Sex_Marital_Status",  "Guarantors", "Assets", "Concurrent_Credits" , "Housing",  "Job",  "Telephone",  "Foreign_Worker")
+```
+
+A decoding matrix's first column contains all the symbolic values, its second column contains the respective categorical values and the third column contains the order of the attributes if the variable is ordinal. If, the categorical variable is not ordinal, its related decoding matrix has only 2 columns.
+
+<center>![](images/pic_decoding_matrix.png)</center><br>
+
+Then, we have defined a function that takes a table, a decoding matrix and a column name as input, and substitute every symbolic value in the column specified of the table with its respective categorical value.
+Finally, it returns the table with the decoded values in the column specified by the column name provided in input.
+
+```{r Decode function}
+# Define a new function
+# Name: f_decode_values
+# Input: tbl_data, df_decoding_matrix and col_name
+# Process: Substitute the symbolic value in the specified column of the table with its respective categorical value
+# Output: return the same table given as input, but with changed values in the specified column
+f_decode_values <- function(tbl_data, df_decoding_matrix, col_name){
+  
+  # Cycle through each value of the specified column
+  for (i in seq_along(tbl_data[[col_name]])){
+    
+    # Cycle through the decoding matrix to find what value matches the one in the data
+    for (y in seq_along(df_decoding_matrix[,1])){
+      
+      # Check if the value in the decoding matrix matches the symbolic value in the data.
+      # If so, change the symbolic value with the respective categorical value from the decoding matrix
+      ifelse(tbl_data[[i,col_name]]==df_decoding_matrix[y,1], tbl_data[[i,col_name]] <- df_decoding_matrix[y,2],"")
+    }
+  }
+  
+  # Convert to factor type and add levels 
+  if(length(df_decoding_matrix[1,]) == 3){
+    level_values <- df_decoding_matrix[,2]
+    level_indexes <- df_decoding_matrix[,3]
+    tbl_data[[col_name]] <- factor(tbl_data[[col_name]])
+    levels(tbl_data[[col_name]]) <- level_values[level_indexes]
+  }
+  
+  # Return the updated table
+  return(tbl_data)
+}
+```
+
+At this point, we have used the 'f_decode_values' function for each categorical column.
+```{r Apply Decode function}
+# Cycle through all the categorical columns in the dataset
+for(i in seq_along(v_cat_cols)){
+  
+  # Run the decoding function for each categorical column and save in place the result
+  tbl_german_credit <- f_decode_values(data <- tbl_german_credit,
+                                               df_decoding_matrix <- l_decod_matrices[[i]],
+                                               col_name <- v_cat_cols[i])
+}
+```
+
+
+As a result all the values are now understandable and ready to use
+```{r Show updated categorical dataset}
+# Dispaly the first 5 rows of the dataset
+head(tbl_german_credit,5)
+```
+
+Next, to create a correlation matrix, we need a table containing only ordinal categorical, boolean and numeric variables.
+To do this we have defined a new function that takes the same inputs as the decoding function, but transform each symbolic value its respective ordinal position.
+```{r Encode function}
+# Define a new function
+# Name: f_encode_num_values
+# Input: tbl_data, df_decoding_matrix and col_name
+# Process: Substitute the symbolic value in the specified column of the table with its respective categorical value
+# Output: return the same table given as input, but with changed values in the specified column
+f_encode_num_values <- function(tbl_data, df_decoding_matrix, col_name){
+  # Check if the decoding matrix has 3 columns, if not the variable is not ordinal and do nothing
+  if(length(df_decoding_matrix[1,]) == 3){
+    
+    # Create a new integer vector with of the same lenght of the specified column
+    v_encoded_col <- vector(mode="integer", length <- length(tbl_data[[col_name]]))
+    
+    # Cycle through each value of the specified column
+    for (i in seq_along(tbl_data[[col_name]])){
+      
+      # Cycle through each value of the decoding matrix to find what value matches the one in the data
+      for (y in seq_along(df_decoding_matrix[,1])){
+        
+        # Check if the value in the decoding matrix matches the one in the data and substitute it with its
+        # respective ordinal number if it does
+        ifelse(tbl_data[[i,col_name]]==df_decoding_matrix[y,1], v_encoded_col[i] <- df_decoding_matrix[y,3],"")
+      }
+    }
+    
+    # Once all the symbolic values have been substituted with their respective ordinal values, update the   
+    # whole column with the updated values
+    tbl_data[[col_name]] <- v_encoded_col
+  }
+  
+  # Return the updated table
+  return(tbl_data)
+}
+```
+
+Similar to before, we applied the encode function to each ordinal and boolean categorical column in the dataset. Next, we have dropped all the non-ordinal and non-boolean columns, since they are not meaningful in a correlation plot.
+```{r Apply Enconde function}
+# Cycle through all the ordinal and boolean categorical columns in the dataset
+for(i in seq_along(v_cat_cols)){
+  
+  # Run the encoding function for each column and save in place the result
+  tbl_german_credit_num <- f_encode_num_values(data <- tbl_german_credit_num,
+                                                         decoding_matrix <- l_decod_matrices[[i]],
+                                                         col_name<-v_cat_cols[i])
+}
+# Drop the non-ordinal and non-boolean columns
+tbl_german_credit_num <- tbl_german_credit_num %>% 
+  select(-Purpose, -Sex_Marital_Status, -Concurrent_Credits)
+```
+
+
+As a result of our transformations, we ended up with the following 2 tables:
+``` {r Show unique categorical values}
+# Show unique values for each column
+for(i in seq_along(tbl_german_credit)){
+  cat("\n",colnames(tbl_german_credit)[i],"\n")
+  print(head(unique(tbl_german_credit[[i]]),10))
+}
+```
+
+``` {r Show unique numeric values}
+# Show unique values for each column
+for(i in seq_along(tbl_german_credit_num)){
+  cat("\n",colnames(tbl_german_credit_num)[i],"\n")
+  print(head(unique(tbl_german_credit_num[[i]]),10))
+}
+```
+
+
+
+<center>![](images/Picture5.png)<br></center>
+
+## 2. Data Collection
+
+The dataset was made public for research purposes vis-a-vis minimizing loss and maximizing profits on behalf of the bank from consumer credits. 
+
+## 3. Data Analysis 
+
+Since the objective is to predict the Credit Risk of a customer, using a correlation matrix, we were able to identify which ones have a strong linear correlation with consumers' credit risk.
+
+
+```{r correlation matrix, echo=TRUE}
+m_corr <- rcorr(as.matrix(tbl_german_credit_num))
+corrplot(m_corr$r, type="upper", order="hclust",
+          p.mat=m_corr$P, sig.level=0.01, insig="blank",
+         tl.offset = 0.50, tl.cex = 0.50)
+```
+
+<br>Insights: Credit Risk is positively correlated with:
+<ul>
+<li>Account_Balance</li>
+<li>Status_Prev_Credit</li>
+<li>Employment_Duration</li>
+</ul>
+
+and it is negatively correlated with:
+<ul>
+<li>Duration_of_Credit</li>
+<li>Credit_Amount</li>
+<li>Assets</li>
+</ul>
+
+
+```{r Visualizing the classification of consumer credit}
+
+# Adding a column for Credit Risk color
+tbl_german_credit_graphs <- tbl_german_credit
+tbl_german_credit_graphs$Credit_Risk_c <- ifelse(tbl_german_credit_graphs$Credit_Risk==0,"Good","Bad")
+ggplot(data=tbl_german_credit_graphs, aes(x=Status_Prev_Credits, fill=Credit_Risk_c, position='fill')) +
+    geom_bar(position='fill')+
+    labs(title="Visualizing the classification of consumer credit",
+       subtitle = "Payment status from their credit history") +
+    theme(text = element_text(size=10),
+        axis.text.x = element_text(angle=25, hjust=1))+
+    xlab("Credit History")
+```
+<br>Insights: Consumers' credit history were segmented into five categories: "all paid", "critical/other existing credits","delayed previously", "existing paid", and "no credits". What piqued our interest from this plot is that there is a higher count of risky customers even if they have not taken any credits yet from the institution, along with customers with fully-paid credit history. This is a critical decision that should be concerned about since higher the credit risk, the more validation of uncertainty must be arranged between the stakeholders and the management. Also, this might raise a flag of how accurately they handle the selection process and assess loan grants. link: https://www.creditmanagement-tools.com/credit-risk-who-decide-c1-r1133.php
+
+
+```{r Age distribution by Creditability, echo=TRUE}
+ggplot(data=tbl_german_credit_graphs, aes(x=Age, fill=Credit_Risk_c))+
+  geom_density(alpha=0.3)+
+  labs(title="Age distribution by Creditability")+
+  xlab("Age")+
+  ylab("Density")
+```
+<br>Insights: How risky are young borrowers? We can observe in this right-skewed plot that it is evident that younger people ages 25-30, at an average, avail more loan credit and are also tagged as much riskier. However, this can be also brought about by some lurking variables (e.g., the range of income, source of income (financial stability such as pension, other savings), etc). However, regardless of age, all individuals have distinct characteristics of being able to grant loan or not
+. 
+```{r Collaterals, echo=TRUE}
+ggplot(data=tbl_german_credit_graphs, aes(x=Assets, fill=Credit_Risk_c)) +
+  geom_bar(position="dodge")+
+  labs(title="What collateral do customers have?")
+```
+
+<br>Insights: The plot displays the headcount of customers' assets for collateral loan. Notice that majority of the customers are primary backed up by their car property, which basically is the existing system accepted by lending institutions especially when a customer has a bad credit history. However, despite the indication of secured loan status, some customers who use their car as collateral are much riskier. Given that it is under a short-term loan, it could result to delay in repayments having higher interest rates to pay. 
+
+
+```{r Credit Risk by Loan Duration, echo=TRUE}
+ggplot(data=tbl_german_credit_graphs, aes(x=Duration_of_Credit, color=Credit_Risk_c)) +
+  geom_density(position="identity")+
+  labs(title="Credit Risk by Loan Duration")+
+  xlab("Years")+
+  ylab("Density")
+```
+<br>Insights: The dataset includes 1-5 years of loan term and the plot illustrates that customers are likely to avail shorter loan term (for about 53% of the sample taken) than longer ones. While risky customers have lower counts for shorter terms, they behave the opposite in the long run where it can be seen that this group tend to avail the longer loan terms. For this type personal loans, prefer short-term loans even if they would earn more for longer terms. 
+
+## 3.1 Outliers Treatment
+
+
+```{r Credit_Amount Boxplot: Credit_Amount, echo=TRUE}
+ggplot(data=tbl_german_credit_graphs, aes(x=Credit_Amount)) +
+  geom_boxplot()+
+  geom_vline(xintercept=(sd(tbl_german_credit$Credit_Amount)*3) + mean(tbl_german_credit$Credit_Amount), color='Blue')
+  
+```
+<br>The boxplot shows the distribution of the numerical variable Credit_Amount where there are many values that lie beyond the 3rd quantile (approximately 64 years of age). Given that large number of outliers, we decided to cap them at a certain value, which in this case, by 3 standard deviations away from the mean. This being considered, there will be only 1 outlier left to drop.
+
+
+```{r outliers detection: Credit_Amount, echo=TRUE}
+#Finding std of Credit_Amount
+sd_credit_amount <- sd(tbl_german_credit$Credit_Amount)
+#Check if the top outlier is more than 3 standard deviations
+max_sd_credit_amount <- (max(tbl_german_credit$Credit_Amount)-mean(tbl_german_credit$Credit_Amount)) / sd_credit_amount
+cat("Now, the biggest outlier for Credit Amount is", max_sd_credit_amount, "stds away from the mean")
+```
+
+```{r Dropping outliers: Credit_Amount, echo=TRUE}
+tbl_german_credit <- tbl_german_credit %>% 
+  filter(Credit_Amount < (sd_credit_amount*3) + mean(tbl_german_credit$Credit_Amount))
+```
+
+
+```{r Age Boxplot, echo=TRUE}
+ggplot(data=tbl_german_credit, aes(x=Age)) +
+  geom_boxplot() + 
+  geom_vline(xintercept=(sd(tbl_german_credit$Age)*3) + mean(tbl_german_credit$Age), color='Blue')
+#Finding std of Age
+sd_credit_age <- sd(tbl_german_credit$Age)
+#Check if the top outlier is more than 3 standard deviations
+max(tbl_german_credit$Credit_Amount) / sd_credit_amount
+```
+
+In this boxplot, showing the distribution of age. As before, we decided to dropall the outliers lying more than 3 standard deviations away from the mean.
+
+
+
+
+```{r outliers detection: Age, echo=TRUE}
+#Finding std of Credit_Amount
+sd_credit_age <- sd(tbl_german_credit$Age)
+#Check if the top outlier is more than 3 standard deviations
+max_sd_credit_age <- (max(tbl_german_credit$Age)-mean(tbl_german_credit$Age)) / sd_credit_age
+cat("The biggest outlier for Age is", max_sd_credit_age, "stds away from the mean")
+```
+
+```{r Dropping outliers: Age, echo=TRUE}
+tbl_german_credit <- tbl_german_credit %>% 
+  filter(Age < (sd_credit_age*3) + mean(tbl_german_credit$Age))
+```
+## Conclusions
+
+
+The visualizations and the correlation matrix show some substantial relationships between many different variables and the dependent variable "Credit_Risk". With all these, we can confidently conclude that the dataset has sufficient information to create a model predicting the credit worthiness of potential customers with reliable accuracy.
+
+
+# Modelling and Communication 
+
+### Training and Testing Dataset
+
+ We randomly split the dataset into a particular ratio where 80% will be the training set mainly for building the predictive model whereas 20% will be the testing set specific for evaluating the model. In this  way, the model can be trained in a larger scale in order to adapt to possible exposure of real and random effects[1] and 80/20 is considered a fair split given the number of observations that we have[2]. [source: [1] https://towardsdatascience.com/train-test-split-c3eed34f763b,[2] https://stackoverflow.com/questions/13610074/is-there-a-rule-of-thumb-for-how-to-divide-a-dataset-into-training-and-validation] 
+```{r}
+# Split dataset in train (80%) and test (20%)
+set.seed(150)
+input_sample <- sort(sample(nrow(tbl_german_credit), nrow(tbl_german_credit)*.8))
+train <- tbl_german_credit[input_sample, ] 
+test <- tbl_german_credit[-input_sample, ]
+```
+
+Using `dim()` function, we can print the dimensions of all  variables and notice the 80%-20% split of the dataset:
+
+```{r dimensions}
+dim(train)
+dim(test)
+```
+
+### Using logit model
+#### Full Model
+We ran a basic logistic regression model, named `model_f`, containing all $\beta$ parameters in the dataset to know which necessary variables should be retained in the following steps. The code below estimates a logit model using `glm()` function. Take note that all categorical variables are already set up as factors so that the model can treat them as one. 
+
+```{r Train Full Model}
+# Train full model
+model_f <- glm(formula = Credit_Risk ~ ., data = train, family = binomial(link="logit"))
+
+summary(model_f)
+```
+
+This model shows many statistically insignificant variables, for example N_Depedents and Telephone, have p-values greater than 0.05, making them unrelevant for the scope of our analysis. In the next steps we are going to select a model using the most useful and statistically significant variables.
+
+<br><br>
+
+#### Choosing the number of independent variables
+As with any predictive modeling, we can not simply conclude that this model would be sufficient enough to explain that the variables are actually contributing to the credit risk of a customer. Variables with p-value greater than the significant level of 5% prompt us to perform another model, keeping only the variables that are found statistically significant with the dependent variable. 
+
+Apart from looking at the p-values, another way to select variables that seem a better fit to the model is by using a `random forest algorithm` where `repeated cross-validation method` is done to test the variables in different subsets. 
+
+```{r Cross-validation method}
+# Convert table to data.frame
+train <- data.frame(train)
+
+# Convert Credit_Risk to column to factor
+train[,21] <- as_factor(train[,21])
+
+# Set up the random forest algorithm using a repteaded cross validation made of 5 subsets and repeat the whole process 10 times with different subsets
+train_ctrl <- rfeControl(functions = rfFuncs, method="repeatedcv", number=5, repeats = 10,verbose=FALSE)
+
+# Run the model
+rf_result <- rfe(x = train[,1:20], y = train[,21], sizes = c(1:20), rfeControl = train_ctrl)
+
+# Average results by variable
+rankings <- rf_result$variables %>%
+  group_by(var) %>%
+  summarise(Overall = mean(Overall)) %>%
+  arrange(desc(Overall))
+
+# Plot the results
+ggplot(data=rf_result, aes(x=Variables, y=Kappa)) +
+  geom_line() +
+  geom_hline(yintercept=0.755, color="red")+
+  labs(title="Figure 1: Accuracy by Number of Variable Selection")+
+  xlab("Number of Variables")
+
+ggplot(data=rankings, aes(y=reorder(var,Overall),x=Overall)) +
+  geom_bar(stat='identity')+
+  labs(title="Figure 2: Variable Ranking")+
+  xlab("Overall Accuracy")+
+  ylab("Variables")
+```
+
+The idea of `Figure 1` is to show the accuracy rate it can give you if a certain number of variables will be considered. To detail, if we choose to use 5 variables, the accuracy rate would be approximately 74%. However, looking at the plot, variables above 10 move relatively close to each other at a rate of 75%, hence we set the threshold at the similar rate (the red line). With this, we decided to reduce the variables from the full model of 20 variables to a reduced one with 12 variables. 
+
+`Figure 2` allows us to know which specific variables should be plugged into the model where variables were ranked by its overall relevance. With this, we can now proceed  to building the reduced model. 
+
+#### Reduced Model
+
+```{r Train Reduced Model}
+# reduced model
+model_r <- glm(formula = Credit_Risk ~ Credit_Amount  + Installment_Rate + Duration_of_Credit + Age + Savings + Account_Balance + Status_Prev_Credits + Purpose + Guarantors + Concurrent_Credits + Employment_Duration + Assets, data = train, family = binomial(link="logit"))
+
+summary(model_r)
+```
+
+
+#### Making Predictions
+
+We'll now make predictions using the testing dataset to evaluate the regression model that was made. The procedure is as follows:
+ <li> 1. Create a variable called `model_f_pred`(full model) and `model_r_pred`  (reduced model) to determine the predict the class probabilities of     observations based on predictor variables.</li>
+  <li> 2. After doing so, use `head()` function to display the probability output of certain rows, in our case, it's 10. </li>
+ <li>  3. Assign the observations to the class with probability score of 0.05.</li>
+  <li> 4. using the `table()`, check the the confusion matrix showing which classes do the probabilities refer to. For example, the frequency of         predictions compared to the frequency of the real data.</li>
+  
+### Full Model
+  
+```{r Prediction: Full Model}
+
+#prediction method to find out predictions from the logistic regression made 
+model_f_pred <- predict(model_f, test, type="response")
+
+#displays the probability output of the first 10 rows of the dataset 
+head(model_f_pred, 10)
+
+#decision rule assignment 
+model_f_dr <- ifelse(model_f_pred > 0.5, 1,0)
+```
+
+
+```{r Full Model: Confusion Matrix}
+#displays the confusion matrix  as  an output 
+table(model_f_dr, test$Credit_Risk)
+```
+
+The confusion matrix shows the frequencies of true positives (0,0), false positives (0,1), false negatives (1,0), true negatives (1,1) of the model prediction. Where a false positive corresponds to a type 1 error and a false negative corresponds to a type 2 error. In our case, the models makes 25 type 1 errors, predicting 25 'Good' credit risks when in fact, should be classified as 'Bad'.
+
+### Assessing the model accuracy
+
+This step will be measured by getting the mean of proportion of correctly classified observations.
+
+```{r Full Model: Accuracy testing}
+# Accuracy
+mean(model_f_dr == test$Credit_Risk)
+```
+
+Running this code will give us the classification prediction accuracy of 75%, which indicates a good rate, having a classification error of 22%. 
+### Reduced Model
+```{r Prediction: Reduced Model}
+
+#prediction method to find out predictions from the logistic regression made 
+model_r_pred <- predict(model_r, test, type="response")
+
+#displays the probability output of the first 10 rows of the dataset 
+head(model_r_pred, 10)
+
+#decision rule assignment 
+model_r_dr <- ifelse(model_r_pred > 0.6, 1,0)
+```
+
+```{r Reduced Model: Confusion matrix}
+#displays the confusion matrix  as  an output 
+table(model_r_dr, test$Credit_Risk)
+```
+
+Similar as above, the reduced logistic regression model commits 28 type 1 errors and 11 type 2 errors.
+
+```{r Reduced Model: Accuracy testing}
+# Accuracy
+mean(model_r_dr == test$Credit_Risk)
+```
+
+As for the reduced model, it achieved a classification prediction accuracy of 80%, which indicates a good rate, having a classification error of 20%.
+
+#### ROC Curves
+
+At this point, we can plot the Receiver Operating Characteristic (ROC), which summarizes the model's performance by assessing the exchange of true positive rate and false positive rate.  By assumption, the predictability power was set at prob > 0.05. If we want to check a particular  threshold to plug in the prediction model, this is a useful plot to refer to. [source: https://www.analyticsvidhya.com/blog/2015/11/beginners-guide-on-logistic-regression-in-r/]
+
+TPR: True Positive Rate
+FPR: False Positive Rate
+
+```{r ROC}
+library(ROCR)
+#prediction for full model 
+roc_full <- model_f_pred #create a variable
+roc_prediction_f <- prediction(roc_full, test$Credit_Risk) #cross-validation of the 2 vectors for full model
+roc_performance_f <- ROCR::performance(roc_prediction_f, "tpr", "fpr") #Y and Yhat are rvs representing  the class and  the prediction for randomly drawn sample in the full model
+#plotting  the curve 
+plot(roc_performance_f, colorize = T, print.cutoffs.at=seq(0.1, by= (0.1)),
+       main = "Full Model: ROC Curve")
+#prediction for reduced model 
+roc_reduced <- model_r_pred
+roc_prediction_r <- prediction(roc_reduced, test$Credit_Risk) #cross-validation of the 2 vectors for full model
+roc_performance_r <- ROCR::performance(roc_prediction_r, "tpr", "fpr")#Y and Yhat are rvs representing  the class and  the prediction for randomly  drawn sample in the  reduced model  
+#plotting the curve
+plot(roc_performance_r, colorize = T, print.cutoffs.at=seq(0.1, by= (0.1)),
+       main = "Reduced Model: ROC Curve")
+```
+
+The ROC curves show all the possible combinations of True Positive rates and False Positive rates.
+
+```{r AUC plotting}
+#plotting the curve of the two models 
+plot(roc_performance_r, col = "blue", print.cutoffs.at=seq(0.1, by= (0.20)),
+     main="AUC: Area under the curve")+
+plot(roc_performance_f, add = TRUE, print.cutoffs.at=seq(0.1, by= (0.20)))
+```
+Plotting together the predictions of the full and reduced models we can conclude that there is not any statistical difference between the 2. Therefore, the reduced model with less variables is preferred because it provide the same information with less value and it is also less likely to overfit. source:https://people.duke.edu/~mababyak/papers/babyakregression.pdf
+
+
+### AUC: Area under the curve
+
+Using the best threshold for both models with can compare the 
+```{r area under the curve prediction}
+aucfull <- ROCR::performance(roc_prediction_f, measure = "auc",print.auc = TRUE)  
+aucreduced <- ROCR::performance(roc_prediction_r, measure = "auc",print.auc = TRUE)
+aucfull@y.values #outputs the prediction rate of full model
+aucreduced@y.values #outputs the prediction rate of reduced model
+```
+As expected, the 2 models provide a similar accuracy and we can reinforce our decision of preferring the reduced one.
+
+
+# Results and Conclusion
+
+Stage 1: Built a Logistic Regression Model using all the variables as a baseline model.
+
+Stage 2: Ran a random forest algorithm to rank the most relevant variables and choose the number of independent variables
+
+Stage 3: Used the information obtained in Stage 2 to build a Reduced Model, using 12 variables.
+
+Stage 4: Compared the 2 models to assess which has the best performance
+
+Stage 5: The reduced model actually performs better than the full model having lower AIC (explaining that it has lesser errors and a better fit for the data) source: https://www.scribbr.com/statistics/akaike-information-criterion/. Also, having a statistical proof that the variables used were actually relevant.
+
+
+## Insights
+<ul>
+<li>Another one is our numeric predictor variable, credit duration, showing  an effect to every 1 unit change in the predictor variable. The coefficient for the credit term is 0.03.Setting the credit term for 12 months would have an effect of 0.03*12 = 0.36 where as a 24-month term, the effect is 0.48 and so on. Essentially, the longer the term, the riskier it gets since there are higher chances that interest rates will fluctuate over time. source https://www.valuepenguin.com/credit-cards/what-happens-if-late-payment-credit-card</li>
+<li>From the coefficients above, it tells us that customers with account balance —at a maximum amount of 200 DM; they are less likely to be considered as risky customers compared to those who have no account balance at all, having an estimate of 0. The effect of this behavior is 1.34 larger in terms of having a bad credit as is the effect of tracking  a customer with empty financial account.</li>
+<li>The three most important variables to correctly predict the credit risk of customers are the account balance, the duration of the credit and the history of previous credits. For the reason that these variables are respectively related to richness, uncertainty of the future and historical behavior of the customer.</li>
+<li>Surprisingly, the number of dependents a customer is liable for is the least important variable when predicting the credit risk of a customer, despite the costs of having dependents that actually use up the financial ability of the customer.</li>
+<li>Retrieve more data of the customers do not necessarily increase the accuracy of the prediction, in our analysis, adding more than 12 independent variables do not significantly augment the performance of the model.</li>
+</ul>
+
